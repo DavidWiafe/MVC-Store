@@ -2,4 +2,4 @@
 
 <p> This application is built using ASP.NET MVC, SQL Server, Entity Framework and will be hosted on 
 
-Microsoft Azure. </p>
+Microsoft Azure. <br /> <a href="https://mvcstoreone.azurewebsites.net/">Live Site</a></p>
