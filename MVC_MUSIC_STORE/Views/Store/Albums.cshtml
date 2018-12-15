@@ -1,8 +1,26 @@
-﻿
+﻿@model IEnumerable<MVC_MUSIC_STORE.Models.Album>
+
 @{
     ViewBag.Title = "Albums";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <h2>Albums</h2>
+
+<div class="container">
+
+   @foreach(var a in Model) {
+
+       <div class="col-md-4 text-center well">
+            <h4>@a.Title</h4>
+           @a.Artist.Name<br />
+           @String.Format("{0:c}", a.Price)<br />
+           <img src="@a.AlbumArtUrl" alt="@a.Title" height="75"><br />
+           <a href="/Store/AddToCart?AlbumId=@a.AlbumId">
+           <button class="btn btn-primary">Add To Cart</button>
+               </a>
+       </div>
+    }
+
+</div>
 

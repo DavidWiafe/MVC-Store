@@ -24,12 +24,19 @@
                     <li>@Html.ActionLink("Home", "Index", "Home")</li>
                     <li>@Html.ActionLink("About", "About", "Home")</li>
                     <li>@Html.ActionLink("Contact", "Contact", "Home")</li>
-                    <li>@Html.ActionLink("Store","Store","Home")</li>
-                    <li>@Html.ActionLink("FAQ","FAQ","Home")</li>
-                    <li>@Html.ActionLink("The Store","Index","Store")</li>
-                    @if (User.IsInRole("Administrator") ) {
+                    <li>@Html.ActionLink("Store", "Store", "Home")</li>
+                    <li>@Html.ActionLink("FAQ", "FAQ", "Home")</li>
+                    <li>@Html.ActionLink("The Store", "Index", "Store")</li>
+                    <li>@Html.ActionLink("Cart", "ShoppingCart", "Store")</li>
+                    @if (Request.IsAuthenticated)
+                    {
+                        <li>@Html.ActionLink("Order History", "Index", "Orders")</li>
+                    }
+                    @if (User.IsInRole("Administrator"))
+                    {
                         <li>@Html.ActionLink("Albmus", "Index", "Albums")</li>
                     }
+                    <li>@Html.ActionLink("Albmus", "Index", "Albums")</li>
                 </ul><!-- The name, method and directory -->
                 @Html.Partial("_LoginPartial")
             </div>
@@ -46,5 +53,6 @@
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
     @RenderSection("scripts", required: false)
+    <script src="~/Scripts/sorttable.js"></script>
 </body>
 </html>

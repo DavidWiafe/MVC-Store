@@ -10,17 +10,31 @@ using MVC_MUSIC_STORE.Models;
 
 namespace MVC_MUSIC_STORE.Controllers
 {
-    [Authorize(Roles ="Administrator")]
+   // [Authorize(Roles ="Administrator")]
     public class AlbumsController : Controller
     {
         //auto connects to database
-        private MusicStoreModel db = new MusicStoreModel();
+        //private MusicStoreModel db = new MusicStoreModel();
+        private IAlbumsMock db;
 
-        // GET: Albums
+        public AlbumsController()
+        {
+            // if nothing passed to constructor, connect to the db (this is the default)
+            this.db = new EFAlbums();
+        }
+
+        public AlbumsController(IAlbumsMock albumsMock)
+        {
+            // if we pass a mock object to the constructor, we are unit testing so no db
+            this.db = albumsMock;
+        }
+
         public ActionResult Index()
         {
-            var albums = db.Albums.Include(a => a.Artist).Include(a => a.Genre);
-            return View(albums.OrderBy(a => a.Artist.Name).ThenBy(a => a.Title).ToList());
+            //var albums = db.Albums.Include(a => a.Artist).Include(a => a.Genre);
+            //return View(albums.OrderBy(a => a.Artist.Name).ThenBy(a => a.Title).ToList());
+            var albums = db.Albums.OrderBy(a => a.Artist.Name).ThenBy(a => a.Title).ToList();
+            return View("Index", albums);
         }
         [AllowAnonymous]
         // GET: Albums/Details/5
@@ -28,24 +42,29 @@ namespace MVC_MUSIC_STORE.Controllers
         {
             if (id == null)
             {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+                // return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+                return View("Error");
             }
-            Album album = db.Albums.Find(id);
+            //original find
+            //Album album = db.Albums.Find(id);
+            //new code to work with bot db and mock interface
+            Album album = db.Albums.SingleOrDefault(a=> a.AlbumId == id);
             if (album == null)
             {
-                return HttpNotFound();
+                //return HttpNotFound();
+                return View("Error");
             }
-            return View(album);
+            return View("Details", album);
         }
-
+        
         // GET: Albums/Create
         public ActionResult Create()
         {
             ViewBag.ArtistId = new SelectList(db.Artists, "ArtistId", "Name");
             ViewBag.GenreId = new SelectList(db.Genres, "GenreId", "Name");
-            return View();
+            return View("Create");
         }
-
+        
         // POST: Albums/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
@@ -55,33 +74,37 @@ namespace MVC_MUSIC_STORE.Controllers
         {
             if (ModelState.IsValid)
             {
-                db.Albums.Add(album);
-                db.SaveChanges();
+                    db.Save(album);
+                //db.Albums.Add(album);
+                //db.SaveChanges();
                 return RedirectToAction("Index");
             }
 
             ViewBag.ArtistId = new SelectList(db.Artists, "ArtistId", "Name", album.ArtistId);
             ViewBag.GenreId = new SelectList(db.Genres, "GenreId", "Name", album.GenreId);
-            return View(album);
+            return View("Create",album);
         }
-
+        
         // GET: Albums/Edit/5
         public ActionResult Edit(int? id)
         {
             if (id == null)
             {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+                //return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+                    return View("Error");
             }
-            Album album = db.Albums.Find(id);
+            //Album album = db.Albums.Find(id);
+            Album album = db.Albums.SingleOrDefault(a => a.AlbumId == id);
             if (album == null)
             {
-                return HttpNotFound();
+                //return HttpNotFound();
+                    return View("Error");
             }
             ViewBag.ArtistId = new SelectList(db.Artists, "ArtistId", "Name", album.ArtistId);
             ViewBag.GenreId = new SelectList(db.Genres, "GenreId", "Name", album.GenreId);
-            return View(album);
+            return View("Edit",album);
         }
-
+        
         // POST: Albums/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
@@ -91,41 +114,56 @@ namespace MVC_MUSIC_STORE.Controllers
         {
             if (ModelState.IsValid)
             {
-                db.Entry(album).State = EntityState.Modified;
-                db.SaveChanges();
+                //db.Entry(album).State = EntityState.Modified;
+                //db.SaveChanges();
+                db.Save(album);
                 return RedirectToAction("Index");
             }
             ViewBag.ArtistId = new SelectList(db.Artists, "ArtistId", "Name", album.ArtistId);
             ViewBag.GenreId = new SelectList(db.Genres, "GenreId", "Name", album.GenreId);
-            return View(album);
+            return View("Edit",album);
         }
-
+        
         // GET: Albums/Delete/5
         public ActionResult Delete(int? id)
         {
             if (id == null)
             {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+                //return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+                return View("Error");
             }
-            Album album = db.Albums.Find(id);
+            //Album album = db.Albums.Find(id);
+            Album album = db.Albums.SingleOrDefault(a => a.AlbumId == id);
             if (album == null)
             {
-                return HttpNotFound();
+                //return HttpNotFound();
+                return View("Error");
             }
-            return View(album);
+            return View("Delete",album);
         }
-
+        
         // POST: Albums/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public ActionResult DeleteConfirmed(int id)
+        public ActionResult DeleteConfirmed(int? id)
         {
-            Album album = db.Albums.Find(id);
-            db.Albums.Remove(album);
-            db.SaveChanges();
+            if(id == null) {
+
+                return View("Error");
+            }
+            //Album album = db.Albums.Find(id);
+            //db.Albums.Remove(album);
+            //db.SaveChanges();
+            //Album = 
+            Album album = db.Albums.SingleOrDefault(a => a.AlbumId == id);
+            if (album == null) {
+
+                return View("Error");
+            }
+            db.Delete(album);
             return RedirectToAction("Index");
         }
-
+        /*
         protected override void Dispose(bool disposing)
         {
             if (disposing)
@@ -133,6 +171,6 @@ namespace MVC_MUSIC_STORE.Controllers
                 db.Dispose();
             }
             base.Dispose(disposing);
-        }
+        }*/
     }
 }

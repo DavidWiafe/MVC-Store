@@ -1,0 +1,51 @@
+﻿
+@{
+        ViewBag.Title = "Graphs";
+        Layout = "~/Views/Shared/_Layout.cshtml";
+        int value = 0;
+        int[] each = {1000,200,2 };
+    }
+
+    @foreach (int item in Model)
+    {
+        value += @item;
+        
+    }
+
+<h2>Graphs</h2>
+<p></p>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript">
+        google.charts.load('current', { 'packages': ['corechart'] });
+        google.charts.setOnLoadCallback(drawChart);
+
+        function drawChart() {
+            // var data = google.visualization.DataTable();
+ //for refernce: https://stackoverflow.com/questions/12415689/how-to-dynamically-add-rows-columns-to-a-google-column-chart
+            var data = google.visualization.arrayToDataTable( [
+                ['Year', 'Sales', 'Expenses'],
+                ['2004', 1000, 400],
+                ['2005', 1170, 460],
+                ['2006', 660, 1120],
+                ['2007', @value, 1000],
+               
+                ['2008',@each[0],@each[1]],
+                
+            ]);
+
+            var options = {
+                title: 'Company Performance',
+                curveType: 'function',
+                legend: { position: 'bottom' }
+            };
+
+            var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
+            
+            chart.draw(data, options);
+        }
+</script>
+<body>
+    <div id="curve_chart" style="width: 900px; height: 500px"></div>
+</body>
+
+

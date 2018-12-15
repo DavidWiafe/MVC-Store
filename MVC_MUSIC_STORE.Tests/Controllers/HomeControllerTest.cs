@@ -35,7 +35,7 @@ namespace MVC_MUSIC_STORE.Tests.Controllers
             ViewResult result = controller.About() as ViewResult;
 
             // Assert
-            Assert.AreEqual("Your application description page.", result.ViewBag.Message);
+            Assert.AreEqual("Your new description page.", result.ViewBag.Message);
         }
 
         [TestMethod]
@@ -46,6 +46,19 @@ namespace MVC_MUSIC_STORE.Tests.Controllers
 
             // Act
             ViewResult result = controller.Contact() as ViewResult;
+
+            // Assert
+            Assert.IsNotNull(result);
+        }
+        
+        [TestMethod]
+        public void FAQ() {
+
+            // Arrange
+            HomeController controller = new HomeController();
+
+            //act
+            ViewResult result = controller.FAQ() as ViewResult;
 
             // Assert
             Assert.IsNotNull(result);
